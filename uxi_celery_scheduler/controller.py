@@ -1,3 +1,6 @@
+import json
+from typing import Any
+
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -9,7 +12,7 @@ from uxi_celery_scheduler.exceptions import PeriodicTaskNotFound
 def schedule_task(
     session: Session,
     scheduled_task: ScheduledTask,
-    **kwargs,
+    **kwargs: Any,
 ) -> PeriodicTask:
     """
     Schedule a task by adding a periodic task entry.
@@ -19,7 +22,7 @@ def schedule_task(
         crontab=schedule,
         name=scheduled_task.name,
         task=scheduled_task.task,
-        kwargs=str(kwargs),
+        kwargs=json.dumps(kwargs),
     )
     session.add(task)
 
