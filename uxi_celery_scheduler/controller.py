@@ -23,7 +23,7 @@ def get_crontab_schedule(session: Session, schedule: Schedule) -> CrontabSchedul
                 CrontabSchedule.timezone == schedule.timezone,
             )
         )
-        .one()
+        .one_or_none()
     )
     return crontab or CrontabSchedule(**schedule.dict())
 
@@ -90,16 +90,16 @@ def update_task(
 
 
 def crontab_is_used(session: Session, crontab_schedule: CrontabSchedule) -> bool:
-    schedule = session.query(PeriodicTask).filter_by(schedule=crontab_schedule).one()
-    return True if schedule else False
+    schedules = session.query(PeriodicTask).filter_by(crontab=crontab_schedule).all()
+    return True if schedules else False
 
 
 def delete_task(session: Session, periodic_task_id: int) -> PeriodicTask:
     try:
         task = session.query(PeriodicTask).get(periodic_task_id)
         session.delete(task)
-        if not crontab_is_used(session, task.schedule):
-            session.delete(task.schedule)
+        if not crontab_is_used(session, task.crontab):
+            session.delete(task.crontab)
         return task
     except NoResultFound as e:
         raise PeriodicTaskNotFound() from e
