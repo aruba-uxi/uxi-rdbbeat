@@ -7,18 +7,40 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from uxi_celery_scheduler.controller import (
     delete_task,
+    get_crontab_schedule,
     schedule_task,
     update_task,
     update_task_enabled_status,
 )
-from uxi_celery_scheduler.data_models import ScheduledTask
+from uxi_celery_scheduler.data_models import Schedule, ScheduledTask
 from uxi_celery_scheduler.db.models import CrontabSchedule, PeriodicTask
 from uxi_celery_scheduler.exceptions import PeriodicTaskNotFound
+
+
+def test_get_new_crontab_schedule(scheduled_task):
+    with patch("sqlalchemy.orm.Session") as mock_session:
+        mock_session.query(CrontabSchedule).filter().one.return_value = None
+        crontab = get_crontab_schedule(mock_session, Schedule(**scheduled_task.get("schedule")))
+        assert crontab.minute == scheduled_task.get("schedule")["minute"]
+        assert crontab.hour == scheduled_task.get("schedule")["hour"]
+        assert crontab.day_of_week == scheduled_task.get("schedule")["day_of_week"]
+        assert crontab.day_of_month == scheduled_task.get("schedule")["day_of_month"]
+        assert crontab.month_of_year == scheduled_task.get("schedule")["month_of_year"]
+        assert crontab.timezone == scheduled_task.get("schedule")["timezone"]
+
+
+def test_get_existing_crontab_schedule(scheduled_task, scheduled_task_db_object):
+    existing_crontab = scheduled_task_db_object.crontab
+    with patch("sqlalchemy.orm.Session") as mock_session:
+        mock_session.query(CrontabSchedule).filter().one.return_value = existing_crontab
+        crontab = get_crontab_schedule(mock_session, Schedule(**scheduled_task.get("schedule")))
+        assert existing_crontab == crontab
 
 
 def test_schedule_task(scheduled_task_db_object, scheduled_task):
     with patch("sqlalchemy.orm.Session") as mock_session:
         mock_session.add.return_value = None
+        mock_session.query(CrontabSchedule).filter().one.return_value = None
 
         actual_scheduled_task = schedule_task(mock_session, ScheduledTask.parse_obj(scheduled_task))
 
@@ -32,6 +54,7 @@ def test_schedule_task(scheduled_task_db_object, scheduled_task):
 def test_schedule_task_kwargs(scheduled_task_db_object, scheduled_task):
     with patch("sqlalchemy.orm.Session") as mock_session:
         mock_session.add.return_value = None
+        mock_session.query(CrontabSchedule).filter().one.return_value = None
 
         actual_scheduled_task = schedule_task(
             mock_session, ScheduledTask.parse_obj(scheduled_task), report_metadata_uid="some_uid"
