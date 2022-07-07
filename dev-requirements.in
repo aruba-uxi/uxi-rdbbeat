@@ -15,3 +15,6 @@ sqlalchemy_utils
 pytest
 coverage
 mock
+
+# version
+bumpversion
