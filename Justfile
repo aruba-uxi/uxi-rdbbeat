@@ -44,3 +44,7 @@ test +ARGS='':
 coverage:
 	coverage xml
 	coverage report
+
+# Server version bump using bumpversion (major, minor, patch)
+bumpversion +ARGS='':
+	bumpversion --config-file .bumpversion.cfg {{ARGS}}
