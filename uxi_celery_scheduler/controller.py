@@ -89,7 +89,7 @@ def update_task(
     return task
 
 
-def crontab_is_used(session: Session, crontab_schedule: CrontabSchedule) -> bool:
+def is_crontab_used(session: Session, crontab_schedule: CrontabSchedule) -> bool:
     schedules = session.query(PeriodicTask).filter_by(crontab=crontab_schedule).all()
     return True if schedules else False
 
