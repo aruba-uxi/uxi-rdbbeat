@@ -7,18 +7,41 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from uxi_celery_scheduler.controller import (
     delete_task,
+    get_crontab_schedule,
+    is_crontab_used,
     schedule_task,
     update_task,
     update_task_enabled_status,
 )
-from uxi_celery_scheduler.data_models import ScheduledTask
+from uxi_celery_scheduler.data_models import Schedule, ScheduledTask
 from uxi_celery_scheduler.db.models import CrontabSchedule, PeriodicTask
 from uxi_celery_scheduler.exceptions import PeriodicTaskNotFound
+
+
+def test_get_new_crontab_schedule(scheduled_task):
+    with patch("sqlalchemy.orm.Session") as mock_session:
+        mock_session.query(CrontabSchedule).filter().one_or_none.return_value = None
+        crontab = get_crontab_schedule(mock_session, Schedule(**scheduled_task.get("schedule")))
+        assert crontab.minute == scheduled_task.get("schedule")["minute"]
+        assert crontab.hour == scheduled_task.get("schedule")["hour"]
+        assert crontab.day_of_week == scheduled_task.get("schedule")["day_of_week"]
+        assert crontab.day_of_month == scheduled_task.get("schedule")["day_of_month"]
+        assert crontab.month_of_year == scheduled_task.get("schedule")["month_of_year"]
+        assert crontab.timezone == scheduled_task.get("schedule")["timezone"]
+
+
+def test_get_existing_crontab_schedule(scheduled_task, scheduled_task_db_object):
+    existing_crontab = scheduled_task_db_object.crontab
+    with patch("sqlalchemy.orm.Session") as mock_session:
+        mock_session.query(CrontabSchedule).filter().one_or_none.return_value = existing_crontab
+        crontab = get_crontab_schedule(mock_session, Schedule(**scheduled_task.get("schedule")))
+        assert existing_crontab == crontab
 
 
 def test_schedule_task(scheduled_task_db_object, scheduled_task):
     with patch("sqlalchemy.orm.Session") as mock_session:
         mock_session.add.return_value = None
+        mock_session.query(CrontabSchedule).filter().one_or_none.return_value = None
 
         actual_scheduled_task = schedule_task(mock_session, ScheduledTask.parse_obj(scheduled_task))
 
@@ -32,6 +55,7 @@ def test_schedule_task(scheduled_task_db_object, scheduled_task):
 def test_schedule_task_kwargs(scheduled_task_db_object, scheduled_task):
     with patch("sqlalchemy.orm.Session") as mock_session:
         mock_session.add.return_value = None
+        mock_session.query(CrontabSchedule).filter().one_or_none.return_value = None
 
         actual_scheduled_task = schedule_task(
             mock_session, ScheduledTask.parse_obj(scheduled_task), report_metadata_uid="some_uid"
@@ -67,6 +91,7 @@ def test_update_task_enabled_status_fail():
 def test_update_task(scheduled_task_db_object):
     with patch("sqlalchemy.orm.Session") as mock_session:
         mock_session.query(PeriodicTask).get.return_value = scheduled_task_db_object
+        mock_session.query(CrontabSchedule).filter().one_or_none.return_value = None
 
         new_schedule: Dict = {
             "minute": "24",
@@ -107,10 +132,20 @@ def test_delete_task(scheduled_task_db_object):
         mock_session.query(PeriodicTask).get.return_value = scheduled_task_db_object
         mock_session.delete.return_value = None
         # Delete task
-        actual_deleted_task = delete_task(mock_session, periodic_task_id)
+        with patch("uxi_celery_scheduler.controller.is_crontab_used") as is_crontab_used:
+            is_crontab_used.return_value = False
+            actual_deleted_task = delete_task(mock_session, periodic_task_id)
 
         expected_deleted_task = scheduled_task_db_object
 
         assert actual_deleted_task.name == expected_deleted_task.name
         assert actual_deleted_task.task == expected_deleted_task.task
         assert actual_deleted_task.schedule == expected_deleted_task.schedule
+
+
+def test_is_crontab_used(scheduled_task_db_object):
+    with patch("sqlalchemy.orm.Session") as mock_session:
+        mock_session.query(PeriodicTask).filter_by().all.return_value = None
+
+        result = is_crontab_used(mock_session, scheduled_task_db_object.schedule)
+        assert result is False
