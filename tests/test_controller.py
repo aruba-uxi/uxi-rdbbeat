@@ -6,9 +6,9 @@ from mock import patch
 from sqlalchemy.orm.exc import NoResultFound
 
 from uxi_celery_scheduler.controller import (
-    crontab_is_used,
     delete_task,
     get_crontab_schedule,
+    is_crontab_used,
     schedule_task,
     update_task,
     update_task_enabled_status,
@@ -132,8 +132,8 @@ def test_delete_task(scheduled_task_db_object):
         mock_session.query(PeriodicTask).get.return_value = scheduled_task_db_object
         mock_session.delete.return_value = None
         # Delete task
-        with patch("uxi_celery_scheduler.controller.crontab_is_used") as crontab_is_used:
-            crontab_is_used.return_value = False
+        with patch("uxi_celery_scheduler.controller.is_crontab_used") as is_crontab_used:
+            is_crontab_used.return_value = False
             actual_deleted_task = delete_task(mock_session, periodic_task_id)
 
         expected_deleted_task = scheduled_task_db_object
@@ -143,9 +143,9 @@ def test_delete_task(scheduled_task_db_object):
         assert actual_deleted_task.schedule == expected_deleted_task.schedule
 
 
-def test_crontab_is_used(scheduled_task_db_object):
+def test_is_crontab_used(scheduled_task_db_object):
     with patch("sqlalchemy.orm.Session") as mock_session:
         mock_session.query(PeriodicTask).filter_by().all.return_value = None
 
-        result = crontab_is_used(mock_session, scheduled_task_db_object.schedule)
+        result = is_crontab_used(mock_session, scheduled_task_db_object.schedule)
         assert result is False

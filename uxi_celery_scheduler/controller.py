@@ -99,7 +99,7 @@ def delete_task(session: Session, periodic_task_id: int) -> PeriodicTask:
         task = session.query(PeriodicTask).get(periodic_task_id)
         session.delete(task)
         session.flush()
-        if not crontab_is_used(session, task.crontab):
+        if not is_crontab_used(session, task.crontab):
             session.delete(task.crontab)
         return task
     except NoResultFound as e:
