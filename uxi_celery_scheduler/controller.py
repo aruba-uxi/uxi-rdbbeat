@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import Any, Optional
 
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
@@ -31,6 +31,9 @@ def get_crontab_schedule(session: Session, schedule: Schedule) -> CrontabSchedul
 def schedule_task(
     session: Session,
     scheduled_task: ScheduledTask,
+    queue: Optional[str] = None,
+    exchange: Optional[str] = None,
+    routing_key: Optional[str] = None,
     **kwargs: Any,
 ) -> PeriodicTask:
     """
@@ -42,6 +45,9 @@ def schedule_task(
         name=scheduled_task.name,
         task=scheduled_task.task,
         kwargs=json.dumps(kwargs),
+        queue=queue,
+        exchange=exchange,
+        routing_key=routing_key,
     )
     session.add(task)
 
