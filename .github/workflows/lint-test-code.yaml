@@ -25,12 +25,11 @@ jobs:
       run: just lint
 
     - name: Run Tests
-        run: |
-          just test
-          just coverage
+      run: |
+        just test
+        just coverage
 
     - name: Check Requirements File Up-To-Date
       run: |
         just requirements
         git diff --exit-code -- requirements.txt
-    

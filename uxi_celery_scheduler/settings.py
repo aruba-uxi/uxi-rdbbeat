@@ -5,5 +5,5 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DATABASE_URL = os.environ.get(
-    "DATABASE_URL", "postgresql://tabloid_service:dev@localhost:5026/tabloid_service"
+    "DATABASE_URL", "postgresql://username:password@localhost:5432/database"
 )
