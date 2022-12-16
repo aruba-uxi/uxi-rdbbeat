@@ -1,11 +1,8 @@
-
-[![code](https://github.com/aruba-uxi/celery-sqlalchemy-scheduler/actions/workflows/lint-test-code.yaml/badge.svg)](https://github.com/aruba-uxi/celery-sqlalchemy-scheduler/actions/workflows/lint-test-code.yaml)
-
+Aruba UXI ![android-icon-good-36x36](https://raw.githubusercontent.com/aruba-uxi/dash/main/public/icons/favicons/favicon-good-32x32.png?token=GHSAT0AAAAAABQNQYIJ6UN4GWI3V6LUMHRMY44LVNQ)
 [![Python Version](https://img.shields.io/badge/python-3.8-blue?logo=Python&logoColor=yellow)](https://docs.python.org/3.8/)
-
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Build: just](https://img.shields.io/badge/%F0%9F%A4%96%20build-just-black?labelColor=white)](https://just.systems/)
-
+[![code](https://github.com/aruba-uxi/celery-sqlalchemy-scheduler/actions/workflows/lint-test-code.yaml/badge.svg)](https://github.com/aruba-uxi/celery-sqlalchemy-scheduler/actions/workflows/lint-test-code.yaml)
 
 # UXI Celery Scheduler
 
