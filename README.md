@@ -13,27 +13,26 @@ A SQLAlchemy-based scheduler for celery-beat.
 
 ## Table Of Contents
 
-- [Setup](#setup)
-- [Development](#development)
-- [Examples](#example-code-1)
-- [Version Control](#version-control)
+- [Installation](#installation)
+- [Celery Configuration](#celery-configuration)
+- [Usage](#usage)
 - [Deployment](#deployment)
-- [Workflows](#workflows)
+- [Contribution](#contribution)
+    - [Setup](#setup)
+    - [Version Control](#version-control)
+    - [Workflows](#workflows)
+- [Acknowledgements](#acknowledgements)
 
-## Setup
 
-This project is setup to use [editorconfig](https://editorconfig.org/). Most editors work but some require a plugin like [VSCode](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)
+## Installation
 
-It's advisable to create a virtual environment for this project to keep packages separate.
-> **__NOTE__:** Using pyenv, you can run `pyenv virtualenv 3.10.<latest> celery-sqlalchemy-scheduler`
+The library is available for download from the official pypi website:
 
-After creating a virtual environment, install the required dependencies.
+`pip install uxi-celery-scheduler`
 
-```sh
-just setup-dev
-```
+Or you can build the library for the source code hosted publicly on GitHub.
 
-### Celery Configuration
+## Celery Configuration
 
 The library makes use of the parent service's database and scope management mechanism.
 You can configure sqlalchemy `session_scope` when you configure celery, for example as:
@@ -51,7 +50,39 @@ celery.conf.update(
 )
 ```
 
-## Development
+## Usage
+### Creating crontab-based periodic task
+
+A crontab schedule has the fields: `minute`, `hour`, `day_of_week`,
+`day_of_month` and `month_of_year`, so if you want the equivalent of a
+`30 * * * *` (execute every 30 minutes) crontab entry, you specify:
+
+```Python
+from uxi_celery_scheduler.controller import schedule_task
+from uxi_celery_scheduler.data_models import ScheduledTask
+
+scheduled_task = {
+    "name": "task_1",
+    "task": "echo",
+    "schedule": {
+        "minute": "30",
+        "hour": "*",
+        "day_of_week": "*",
+        "day_of_month": "*",
+        "month_of_year": "*",
+        "timezone": "UTC",
+    },
+}
+
+with session_scope() as session:
+    task = schedule_task(session, ScheduledTask.parse_ob(scheduled_task))
+```
+
+The crontab schedule is linked to a specific timezone using the
+`timezone` input parameter.
+
+
+## Deployment
 
 The periodic tasks still need 'workers' to execute them. So make sure
 the default **Celery** package is installed. (If not installed, please
@@ -69,33 +100,22 @@ Both the worker and beat services need to be running at the same time.
 
         $ celery -A [project-name] beat -l info --scheduler uxi_celery_scheduler.schedulers:DatabaseScheduler
 
-### Example creating crontab-based periodic task
 
-A crontab schedule has the fields: `minute`, `hour`, `day_of_week`,
-`day_of_month` and `month_of_year`, so if you want the equivalent of a
-`30 * * * *` (execute every 30 minutes) crontab entry, you specify:
+# Contribution
+## Setup
 
-```Python
-    >>> from uxi_celery_scheduler.controller import schedule_task
-    >>> from uxi_celery_scheduler.data_models import ScheduledTask
-    >>> scheduled_task = {
-    ...             "name": "task_1",
-    ...             "task": "echo",
-    ...             "schedule": {
-    ...                 "minute": "30",
-    ...                 "hour": "*",
-    ...                 "day_of_week": "*",
-    ...                 "day_of_month": "*",
-    ...                 "month_of_year": "*",
-    ...                 "timezone": "UTC",
-    ...             },
-    ...         }
-    >>> with session_scope() as session:
-    ...      task = schedule_task(session, ScheduledTask.parse_obj(scheduled_task))
+
+
+This project is setup to use [editorconfig](https://editorconfig.org/). Most editors work but some require a plugin like [VSCode](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)
+
+It's advisable to create a virtual environment for this project to keep packages separate.
+> **__NOTE__:** Using pyenv, you can run `pyenv virtualenv 3.10.<latest> celery-sqlalchemy-scheduler`
+
+After creating a virtual environment, install the required dependencies.
+
+```sh
+just setup-dev
 ```
-
-The crontab schedule is linked to a specific timezone using the
-'timezone' input parameter.
 
 ## Version Control
 
@@ -125,7 +145,7 @@ The repository has a number of github workflows defined in the the `.github/work
 
 
 
-## Acknowledgments
+## Acknowledgements
 
 - [django-celery-beat](https://github.com/celery/django-celery-beat)
 - [celerybeatredis](https://github.com/liuliqiang/celerybeatredis)
