@@ -7,9 +7,9 @@
 [![Build: just](https://img.shields.io/badge/%F0%9F%A4%96%20build-just-black?labelColor=white)](https://just.systems/)
 
 
-# celery sqlalchemy scheduler
+# UXI Celery Scheduler
 
-A Scheduler Based Sqlalchemy for Celery.
+A SQLAlchemy-based scheduler for celery-beat.
 
 ## Table Of Contents
 
@@ -111,18 +111,17 @@ Given a version number `MAJOR.MINOR.PATCH`, increment the:
 
 The repository has a number of github workflows defined in the the `.github/workflows` folder.
 
-### Lint Charts
 
-- Tests helm charts for linting and changes
 
 ### Lint & Test Code
 
 - Tests the code for linting issues
 - Tests the requirements file for any changes
+- Runs the provided unit tests to ensure code quality
 
 ### Release
 
-- Pushes the client to internal gemfury account
+- Pushes the library to Pypi
 
 
 
