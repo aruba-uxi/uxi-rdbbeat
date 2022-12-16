@@ -11,6 +11,7 @@ setup(
     version="1.0.0-beta.2",
     description="A SQLAlchemy-based scheduler for celery-beat",
     long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
     license="MIT",
     classifiers=[
         "Intended Audience :: Developers",
