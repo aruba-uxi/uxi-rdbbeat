@@ -21,6 +21,7 @@ A SQLAlchemy-based scheduler for celery-beat.
     - [Setup](#setup)
     - [Version Control](#version-control)
     - [Workflows](#workflows)
+- [License](#license)
 - [Acknowledgements](#acknowledgements)
 
 
@@ -144,6 +145,8 @@ The repository has a number of github workflows defined in the the `.github/work
 - Pushes the library to Pypi
 
 
+## License
+MIT licensed. See the bundled LICENSE file for more details.
 
 ## Acknowledgements
 
