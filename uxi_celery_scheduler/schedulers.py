@@ -1,7 +1,7 @@
 import datetime as dt
 import logging
 from multiprocessing.util import Finalize
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import sqlalchemy
 from celery import Celery, current_app, schedules
@@ -207,9 +207,9 @@ class ModelEntry(ScheduleEntry):
         cls,
         session: sqlalchemy.orm.Session,
         schedule: schedules.schedule,
-        args: Any = None,
-        kwargs: Dict = None,
-        options: Dict = None,
+        args: Optional[Any],
+        kwargs: Optional[Dict],
+        options: Optional[Dict],
         **entry: Dict,
     ) -> Dict:
         """
@@ -234,11 +234,11 @@ class ModelEntry(ScheduleEntry):
     @classmethod
     def _unpack_options(
         cls,
-        queue: str = None,
-        exchange: str = None,
-        routing_key: str = None,
-        priority: int = None,
-        one_off: bool = None,
+        queue: Optional[str],
+        exchange: Optional[str],
+        routing_key: Optional[str],
+        priority: Optional[int],
+        one_off: Optional[bool],
         expires: Any = None,  # anti-pattern, 281 changes the type
         **kwargs: Dict,
     ) -> Dict:
