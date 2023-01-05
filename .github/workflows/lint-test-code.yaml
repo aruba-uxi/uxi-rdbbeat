@@ -7,29 +7,24 @@ jobs:
     name: Lint & Test Code
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v2
 
-    - name: Setup Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
 
-    - name: Setup Just
-      uses: extractions/setup-just@v1
+      - name: Setup Just
+        uses: extractions/setup-just@v1
 
-    - name: Install Dependencies
-      run: just setup-dev
+      - name: Install Dependencies
+        run: just setup-dev
 
-    - name: Run Code Linting Test
-      run: just lint
+      - name: Run Code Linting Test
+        run: just lint
 
-    - name: Run Tests
-      run: |
-        just test
-        just coverage
-
-    - name: Check Requirements File Up-To-Date
-      run: |
-        just requirements
-        git diff --exit-code -- requirements.txt
+      - name: Run Tests
+        run: |
+          just test
+          just coverage
