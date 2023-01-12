@@ -207,9 +207,9 @@ class ModelEntry(ScheduleEntry):
         cls,
         session: sqlalchemy.orm.Session,
         schedule: schedules.schedule,
-        args: Optional[Any],
-        kwargs: Optional[Dict],
-        options: Optional[Dict],
+        args: Optional[Any] = None,
+        kwargs: Optional[Dict] = None,
+        options: Optional[Dict] = None,
         **entry: Dict,
     ) -> Dict:
         """
@@ -234,11 +234,11 @@ class ModelEntry(ScheduleEntry):
     @classmethod
     def _unpack_options(
         cls,
-        queue: Optional[str],
-        exchange: Optional[str],
-        routing_key: Optional[str],
-        priority: Optional[int],
-        one_off: Optional[bool],
+        queue: Optional[str] = None,
+        exchange: Optional[str] = None,
+        routing_key: Optional[str] = None,
+        priority: Optional[int] = None,
+        one_off: Optional[bool] = None,
         expires: Any = None,  # anti-pattern, 281 changes the type
         **kwargs: Dict,
     ) -> Dict:
