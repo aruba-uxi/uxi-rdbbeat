@@ -23,7 +23,7 @@ setup(
     ],
     url="https://github.com/aruba-uxi/celery-sqlalchemy-scheduler",
     packages=find_packages(exclude=["tests"]),
-    package_data={"uxi_celery_scheduler": ["py.typed"]},
+    package_data={"rdbbeat": ["py.typed"]},
     include_package_data=True,
     zip_safe=False,
     install_requires=["celery~=5.2", "sqlalchemy~=1.4", "alembic", "pydantic", "python-dotenv"],

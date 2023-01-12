@@ -132,7 +132,7 @@ def test_delete_task(scheduled_task_db_object):
         mock_session.query(PeriodicTask).get.return_value = scheduled_task_db_object
         mock_session.delete.return_value = None
         # Delete task
-        with patch("uxi_celery_scheduler.controller.is_crontab_used") as is_crontab_used:
+        with patch("rdbbeat.controller.is_crontab_used") as is_crontab_used:
             is_crontab_used.return_value = False
             actual_deleted_task = delete_task(mock_session, periodic_task_id)
 

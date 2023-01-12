@@ -3,7 +3,7 @@
 [![Build: just](https://img.shields.io/badge/%F0%9F%A4%96%20build-just-black?labelColor=white)](https://just.systems/)
 [![code](https://github.com/aruba-uxi/celery-sqlalchemy-scheduler/actions/workflows/lint-test-code.yaml/badge.svg)](https://github.com/aruba-uxi/celery-sqlalchemy-scheduler/actions/workflows/lint-test-code.yaml)
 
-# UXI Celery Scheduler
+# RDB Celery Scheduler
 
 A SQLAlchemy-based scheduler for celery-beat.
 
@@ -55,8 +55,8 @@ A crontab schedule has the fields: `minute`, `hour`, `day_of_week`,
 `30 * * * *` (execute every 30 minutes) crontab entry, you specify:
 
 ```Python
-from uxi_celery_scheduler.controller import schedule_task
-from uxi_celery_scheduler.data_models import ScheduledTask
+from rdbbeat.controller import schedule_task
+from rdbbeat.data_models import ScheduledTask
 
 scheduled_task = {
     "name": "task_1",
@@ -95,7 +95,7 @@ Both the worker and beat services need to be running at the same time.
 2.  As a separate process, start the beat service (specify the
     scheduler):
 
-        $ celery -A [project-name] beat -l info --scheduler uxi_celery_scheduler.schedulers:DatabaseScheduler
+        $ celery -A [project-name] beat -l info --scheduler rdbbeat.schedulers:DatabaseScheduler
 
 
 # Contribution
