@@ -3,9 +3,9 @@
 [![Build: just](https://img.shields.io/badge/%F0%9F%A4%96%20build-just-black?labelColor=white)](https://just.systems/)
 [![code](https://github.com/aruba-uxi/celery-sqlalchemy-scheduler/actions/workflows/lint-test-code.yaml/badge.svg)](https://github.com/aruba-uxi/celery-sqlalchemy-scheduler/actions/workflows/lint-test-code.yaml)
 
-# RDB Celery Scheduler
+# RDBBeat
 
-A SQLAlchemy-based scheduler for celery-beat.
+`rdbbeat` is a SQLAlchemy-based scheduler for celery-beat that persists periodic tasks in a relational database.
 
 ## Table Of Contents
 
@@ -20,6 +20,7 @@ A SQLAlchemy-based scheduler for celery-beat.
 - [License](#license)
 - [Acknowledgements](#acknowledgements)
 
+> **__NOTE__:** We assume prior knowledge of session management in SQLAlchemy and migrations in Alembic. If you are not familiar with these concepts, please read the documentation for [SQLAlchemy](https://docs.sqlalchemy.org/en/14/orm/session_basics.html) and [Alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html).
 
 ## Installation
 
@@ -29,7 +30,9 @@ The library is available for download from the official pypi website:
 
 Or you can build the library for the source code hosted publicly on GitHub.
 
+
 ## Celery Configuration
+
 
 The library makes use of the parent service's database and scope management mechanism.
 You can configure SQLAlchemy `session_scope` when you configure celery, for example as:
@@ -78,7 +81,13 @@ with session_scope() as session:
 The crontab schedule is linked to a specific timezone using the
 `timezone` input parameter.
 
+## Run the migrations
 
+`rdbbeat` includes a migration script that is required to create the database tables in the `scheduler` schema. Run the following command to run the migrations:
+
+```sh
+python -m alembic -n scheduler upgrade head
+```
 ## Deployment
 
 The periodic tasks still need 'workers' to execute them. So make sure
