@@ -1,6 +1,6 @@
 import pytest
 
-from uxi_celery_scheduler.db.models import CrontabSchedule, PeriodicTask
+from rdbbeat.db.models import CrontabSchedule, PeriodicTask
 
 
 @pytest.fixture

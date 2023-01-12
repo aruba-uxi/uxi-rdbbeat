@@ -9,7 +9,7 @@ from celery.beat import ScheduleEntry, Scheduler
 from celery.utils.time import maybe_make_aware
 from kombu.utils.json import dumps, loads
 
-from uxi_celery_scheduler.db.models import CrontabSchedule, PeriodicTask, PeriodicTaskChanged
+from rdbbeat.db.models import CrontabSchedule, PeriodicTask, PeriodicTaskChanged
 
 # This scheduler must wake up more frequently than the
 # regular of 5 minutes because it needs to take external

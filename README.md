@@ -1,4 +1,3 @@
-Aruba UXI ![android-icon-good-36x36](https://raw.githubusercontent.com/aruba-uxi/dash/main/public/icons/favicons/favicon-good-32x32.png?token=GHSAT0AAAAAABQNQYIJ6UN4GWI3V6LUMHRMY44LVNQ)
 [![Python Version](https://img.shields.io/badge/python-3.8-blue?logo=Python&logoColor=yellow)](https://docs.python.org/3.8/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Build: just](https://img.shields.io/badge/%F0%9F%A4%96%20build-just-black?labelColor=white)](https://just.systems/)
@@ -26,14 +25,14 @@ A SQLAlchemy-based scheduler for celery-beat.
 
 The library is available for download from the official pypi website:
 
-`pip install uxi-celery-scheduler`
+`pip install celery-rdbbeat`
 
 Or you can build the library for the source code hosted publicly on GitHub.
 
 ## Celery Configuration
 
 The library makes use of the parent service's database and scope management mechanism.
-You can configure sqlalchemy `session_scope` when you configure celery, for example as:
+You can configure SQLAlchemy `session_scope` when you configure celery, for example as:
 
 ```Python
 from celery import Celery

@@ -5,7 +5,7 @@
 from setuptools import find_packages, setup
 
 setup(
-    name="uxi-celery-scheduler",
+    name="celery-rdbbeat",
     python_requires=">=3.8",
     author="Aruba UXI",
     version="1.0.0-beta.2",
