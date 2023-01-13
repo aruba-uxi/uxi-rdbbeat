@@ -8,7 +8,7 @@ setup(
     name="celery-rdbbeat",
     python_requires=">=3.8",
     author="Aruba UXI",
-    version="1.0.0-beta.2",
+    version="1.7.2",
     description="A SQLAlchemy-based scheduler for celery-beat",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
