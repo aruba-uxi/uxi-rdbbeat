@@ -13,6 +13,7 @@
 - [Celery Configuration](#celery-configuration)
 - [Usage](#usage)
 - [Deployment](#deployment)
+- [Flask Service Example](#flask-service-example)
 - [Contribution](#contribution)
     - [Setup](#setup)
     - [Version Control](#version-control)
@@ -106,6 +107,10 @@ Both the worker and beat services need to be running at the same time.
 
         $ celery -A [project-name] beat -l info --scheduler rdbbeat.schedulers:DatabaseScheduler
 
+## Flask Service Example
+
+
+Check out the [rdbbeat-flask-example](https://github.com/evanstjabadi/rdbbeat-flask-example) repo for a simple Flask service that uses `rdbbeat` to schedule periodic tasks.
 
 # Contribution
 ## Setup
