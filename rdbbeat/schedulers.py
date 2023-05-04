@@ -261,7 +261,6 @@ class ModelEntry(ScheduleEntry):
 
 
 class DatabaseScheduler(Scheduler):
-
     Entry = ModelEntry
     Model = PeriodicTask
     Changes = PeriodicTaskChanged
@@ -347,7 +346,7 @@ class DatabaseScheduler(Scheduler):
                     self.schedule[name].save()  # save to database
                     logger.debug(f"{name} save to database")
                     _tried.add(name)
-                except (KeyError) as exc:
+                except KeyError as exc:
                     logger.error(exc)
                     _failed.add(name)
         except sqlalchemy.exc.IntegrityError as exc:
