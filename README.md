@@ -27,7 +27,7 @@
 
 The library is available for download from the official pypi website:
 
-`pip install celery-rdbbeat`
+`pip install rdbbeat`
 
 Or you can build the library for the source code hosted publicly on GitHub.
 
