@@ -5,7 +5,7 @@ import pytest
 from mock import patch
 from sqlalchemy.orm.exc import NoResultFound
 
-from uxi_celery_scheduler.controller import (
+from rdbbeat.controller import (
     delete_task,
     get_crontab_schedule,
     is_crontab_used,
@@ -13,9 +13,9 @@ from uxi_celery_scheduler.controller import (
     update_task,
     update_task_enabled_status,
 )
-from uxi_celery_scheduler.data_models import Schedule, ScheduledTask
-from uxi_celery_scheduler.db.models import CrontabSchedule, PeriodicTask
-from uxi_celery_scheduler.exceptions import PeriodicTaskNotFound
+from rdbbeat.data_models import Schedule, ScheduledTask
+from rdbbeat.db.models import CrontabSchedule, PeriodicTask
+from rdbbeat.exceptions import PeriodicTaskNotFound
 
 
 def test_get_new_crontab_schedule(scheduled_task):
@@ -132,7 +132,7 @@ def test_delete_task(scheduled_task_db_object):
         mock_session.query(PeriodicTask).get.return_value = scheduled_task_db_object
         mock_session.delete.return_value = None
         # Delete task
-        with patch("uxi_celery_scheduler.controller.is_crontab_used") as is_crontab_used:
+        with patch("rdbbeat.controller.is_crontab_used") as is_crontab_used:
             is_crontab_used.return_value = False
             actual_deleted_task = delete_task(mock_session, periodic_task_id)
 

@@ -1,7 +1,7 @@
 import datetime as dt
 import logging
 from multiprocessing.util import Finalize
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import sqlalchemy
 from celery import Celery, current_app, schedules
@@ -9,7 +9,7 @@ from celery.beat import ScheduleEntry, Scheduler
 from celery.utils.time import maybe_make_aware
 from kombu.utils.json import dumps, loads
 
-from uxi_celery_scheduler.db.models import CrontabSchedule, PeriodicTask, PeriodicTaskChanged
+from rdbbeat.db.models import CrontabSchedule, PeriodicTask, PeriodicTaskChanged
 
 # This scheduler must wake up more frequently than the
 # regular of 5 minutes because it needs to take external
@@ -207,9 +207,9 @@ class ModelEntry(ScheduleEntry):
         cls,
         session: sqlalchemy.orm.Session,
         schedule: schedules.schedule,
-        args: Any = None,
-        kwargs: Dict = None,
-        options: Dict = None,
+        args: Optional[Any] = None,
+        kwargs: Optional[Dict] = None,
+        options: Optional[Dict] = None,
         **entry: Dict,
     ) -> Dict:
         """
@@ -234,11 +234,11 @@ class ModelEntry(ScheduleEntry):
     @classmethod
     def _unpack_options(
         cls,
-        queue: str = None,
-        exchange: str = None,
-        routing_key: str = None,
-        priority: int = None,
-        one_off: bool = None,
+        queue: Optional[str] = None,
+        exchange: Optional[str] = None,
+        routing_key: Optional[str] = None,
+        priority: Optional[int] = None,
+        one_off: Optional[bool] = None,
         expires: Any = None,  # anti-pattern, 281 changes the type
         **kwargs: Dict,
     ) -> Dict:
@@ -261,7 +261,6 @@ class ModelEntry(ScheduleEntry):
 
 
 class DatabaseScheduler(Scheduler):
-
     Entry = ModelEntry
     Model = PeriodicTask
     Changes = PeriodicTaskChanged
@@ -347,7 +346,7 @@ class DatabaseScheduler(Scheduler):
                     self.schedule[name].save()  # save to database
                     logger.debug(f"{name} save to database")
                     _tried.add(name)
-                except (KeyError) as exc:
+                except KeyError as exc:
                     logger.error(exc)
                     _failed.add(name)
         except sqlalchemy.exc.IntegrityError as exc:

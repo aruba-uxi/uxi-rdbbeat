@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from uxi_celery_scheduler.data_models import Schedule
+from rdbbeat.data_models import Schedule
 
 
 def test_schedule_pass():

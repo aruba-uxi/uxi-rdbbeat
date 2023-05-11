@@ -5,9 +5,9 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
-from uxi_celery_scheduler.data_models import Schedule, ScheduledTask
-from uxi_celery_scheduler.db.models import CrontabSchedule, PeriodicTask
-from uxi_celery_scheduler.exceptions import PeriodicTaskNotFound
+from rdbbeat.data_models import Schedule, ScheduledTask
+from rdbbeat.db.models import CrontabSchedule, PeriodicTask
+from rdbbeat.exceptions import PeriodicTaskNotFound
 
 
 def get_crontab_schedule(session: Session, schedule: Schedule) -> CrontabSchedule:

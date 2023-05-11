@@ -5,11 +5,14 @@
 from setuptools import find_packages, setup
 
 setup(
-    name="uxi-celery-scheduler",
+    name="rdbbeat",
     python_requires=">=3.8",
     author="Aruba UXI",
-    version="1.7.2",
-    description="A SQLalchemy-based Scheduler For Celery Beat",
+    version="0.1.0",
+    description="A SQLAlchemy-based scheduler for celery-beat",
+    long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
+    license="MIT",
     classifiers=[
         "Intended Audience :: Developers",
         "Operating System :: OS Independent",
@@ -20,7 +23,7 @@ setup(
     ],
     url="https://github.com/aruba-uxi/celery-sqlalchemy-scheduler",
     packages=find_packages(exclude=["tests"]),
-    package_data={"uxi_celery_scheduler": ["py.typed"]},
+    package_data={"rdbbeat": ["py.typed"]},
     include_package_data=True,
     zip_safe=False,
     install_requires=["celery~=5.2", "sqlalchemy~=1.4", "alembic", "pydantic", "python-dotenv"],

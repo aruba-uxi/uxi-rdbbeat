@@ -12,7 +12,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, class_mapper, foreign, relationship, remote
 from sqlalchemy.sql import insert, select, update
 
-from uxi_celery_scheduler.tzcrontab import TzAwareCrontab
+from rdbbeat.tzcrontab import TzAwareCrontab
 
 logger = logging.getLogger(__name__)
 
@@ -153,13 +153,13 @@ class PeriodicTask(Base, ModelMixin):
     priority = sa.Column(sa.Integer())
     expires = sa.Column(sa.DateTime(timezone=True))
 
-    # 只执行一次
+    # Execute only once
     one_off = sa.Column(sa.Boolean(), default=False)
     start_time = sa.Column(sa.DateTime(timezone=True))
     enabled = sa.Column(sa.Boolean(), default=True)
     last_run_at = sa.Column(sa.DateTime(timezone=True))
     total_run_count = sa.Column(sa.Integer(), nullable=False, default=0)
-    # 修改时间
+    # Change the time
     date_changed = sa.Column(sa.DateTime(timezone=True), default=func.now(), onupdate=func.now())
     description = sa.Column(sa.Text(), default="")
 
