@@ -26,5 +26,12 @@ setup(
     package_data={"rdbbeat": ["py.typed"]},
     include_package_data=True,
     zip_safe=False,
-    install_requires=["celery~=5.2", "sqlalchemy~=1.4", "alembic", "pydantic", "python-dotenv"],
+    install_requires=[
+        "celery~=5.2",
+        "sqlalchemy~=1.4",
+        "alembic",
+        "pydantic",
+        "python-dotenv",
+        "pytz",
+    ],
 )
