@@ -1,3 +1,7 @@
+# Copyright (c) 2018 AngelLiang
+# Copyright (c) 2023 Hewlett Packard Enterprise Development LP
+# MIT License
+
 import datetime as dt
 from collections import namedtuple
 from datetime import datetime

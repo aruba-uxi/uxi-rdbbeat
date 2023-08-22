@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Hewlett Packard Enterprise Development LP
+# MIT License
+
 import json
 from typing import Any, Optional
 

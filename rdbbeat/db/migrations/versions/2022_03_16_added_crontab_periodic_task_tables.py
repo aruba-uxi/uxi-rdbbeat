@@ -1,3 +1,7 @@
+# Copyright (c) 2018 AngelLiang
+# Copyright (c) 2023 Hewlett Packard Enterprise Development LP
+# MIT License
+
 """added crontab + periodic task tables
 
 Revision ID: 6cc745c3fb42

@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Hewlett Packard Enterprise Development LP
+# MIT License
+
 from pydantic import BaseModel, validator
 
 

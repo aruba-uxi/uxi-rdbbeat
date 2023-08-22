@@ -1,3 +1,7 @@
+# Copyright (c) 2018 AngelLiang
+# Copyright (c) 2023 Hewlett Packard Enterprise Development LP
+# MIT License
+
 import datetime as dt
 import logging
 from typing import Any, Dict, Union
