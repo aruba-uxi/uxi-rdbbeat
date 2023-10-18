@@ -1,5 +1,9 @@
 # Change history
 
-## v0.3.0
+## v0.2.0
 
-- Support Celery 5.0.1
+- Add support for `SQLAlchemy 2.0` PR #35 by @pattertj
+
+## v0.1.1
+
+- Initial release for `rdbbeat`
