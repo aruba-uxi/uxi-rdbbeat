@@ -30,7 +30,7 @@ setup(
         "celery~=5.2",
         "sqlalchemy",
         "alembic",
-        "pydantic",
+        "pydantic<2.0",
         "python-dotenv",
         "pytz",
     ],

@@ -10,9 +10,9 @@ import pytz
 import sqlalchemy as sa
 from celery import schedules
 from sqlalchemy import MetaData, func
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine import Connection
 from sqlalchemy.event import listen
-from sqlalchemy.orm import Session, class_mapper, declarative_base, foreign, relationship, remote
+from sqlalchemy.orm import Mapper, Session, declarative_base, foreign, relationship, remote
 from sqlalchemy.sql import insert, select, update
 
 from rdbbeat.tzcrontab import TzAwareCrontab
@@ -52,12 +52,12 @@ class CrontabSchedule(Base, ModelMixin):
     @property
     def schedule(self) -> TzAwareCrontab:
         return TzAwareCrontab(
-            minute=self.minute,
-            hour=self.hour,
-            day_of_week=self.day_of_week,
-            day_of_month=self.day_of_month,
-            month_of_year=self.month_of_year,
-            tz=pytz.timezone(self.timezone),
+            minute=str(self.minute),
+            hour=str(self.hour),
+            day_of_week=str(self.day_of_week),
+            day_of_month=str(self.day_of_month),
+            month_of_year=str(self.month_of_year),
+            tz=pytz.timezone(str(self.timezone)),
         )
 
     @classmethod
@@ -89,9 +89,7 @@ class PeriodicTaskChanged(Base, ModelMixin):
     last_update = sa.Column(sa.DateTime(timezone=True), nullable=False, default=dt.datetime.now)
 
     @classmethod
-    def changed(
-        cls, mapper: class_mapper, connection: Engine.connect, target: "PeriodicTask"
-    ) -> None:
+    def changed(cls, mapper: Mapper, connection: Connection, target: "PeriodicTask") -> None:
         """
         :param mapper: the Mapper which is the target of this event
         :param connection: the Connection being used
@@ -101,19 +99,19 @@ class PeriodicTaskChanged(Base, ModelMixin):
             cls.update_changed(mapper, connection, target)
 
     @classmethod
-    def update_changed(
-        cls, mapper: class_mapper, connection: Engine.connect, target: "PeriodicTask"
-    ) -> None:
+    def update_changed(cls, mapper: Mapper, connection: Connection, target: "PeriodicTask") -> None:
         """
         :param mapper: the Mapper which is the target of this event
         :param connection: the Connection being used
         :param target: the mapped instance being persisted
         """
         s = connection.execute(
-            select([PeriodicTaskChanged]).where(PeriodicTaskChanged.id == 1).limit(1)
+            select(PeriodicTaskChanged).where(PeriodicTaskChanged.id == 1).limit(1)
         )
         if not s:
-            s = connection.execute(insert(PeriodicTaskChanged), last_update=dt.datetime.now())
+            s = connection.execute(
+                insert(PeriodicTaskChanged).values(last_update=dt.datetime.now())
+            )
         else:
             s = connection.execute(
                 update(PeriodicTaskChanged)
@@ -157,9 +155,9 @@ class PeriodicTask(Base, ModelMixin):
     expires = sa.Column(sa.DateTime(timezone=True))
 
     # Execute only once
-    one_off = sa.Column(sa.Boolean(), default=False)
+    one_off: sa.Column = sa.Column(sa.Boolean(), default=False)
     start_time = sa.Column(sa.DateTime(timezone=True))
-    enabled = sa.Column(sa.Boolean(), default=True)
+    enabled: sa.Column = sa.Column(sa.Boolean(), default=True)
     last_run_at = sa.Column(sa.DateTime(timezone=True))
     total_run_count = sa.Column(sa.Integer(), nullable=False, default=0)
     # Change the time
@@ -170,11 +168,11 @@ class PeriodicTask(Base, ModelMixin):
 
     @property
     def task_name(self) -> str:
-        return self.task
+        return str(self.task)
 
     @task_name.setter
     def task_name(self, value: str) -> None:
-        self.task = value
+        self.task = value  # type: ignore [assignment]
 
     @property
     def schedule(self) -> schedules.schedule:
