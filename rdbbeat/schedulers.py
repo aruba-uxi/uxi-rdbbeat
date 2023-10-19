@@ -5,7 +5,7 @@
 import datetime as dt
 import logging
 from multiprocessing.util import Finalize
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 import sqlalchemy
 from celery import Celery, current_app, schedules
@@ -40,7 +40,7 @@ class ModelEntry(ScheduleEntry):
     def __init__(
         self,
         model: schedules.schedule,
-        session_scope: sqlalchemy.orm.Session,
+        session_scope: Callable,
         app: Celery = None,
         **kw: Any,
     ) -> None:
@@ -177,7 +177,7 @@ class ModelEntry(ScheduleEntry):
 
     @classmethod
     def from_entry(
-        cls, name: str, session_scope: sqlalchemy.orm.Session, app: Celery = None, **entry: Dict
+        cls, name: str, session_scope: Callable, app: Celery = None, **entry: Dict
     ) -> "PeriodicTask":
         """
 
@@ -228,7 +228,7 @@ class ModelEntry(ScheduleEntry):
         model_schedule, model_field = cls.to_model_schedule(session, schedule)
         entry.update(
             # the model_id which to relationship
-            {model_field + "_id": model_schedule.id},
+            {model_field + "_id": model_schedule.id},  # type: ignore [dict-item]
             args=dumps(args or []),
             kwargs=dumps(kwargs or {}),
             **cls._unpack_options(**options or {}),
@@ -277,7 +277,7 @@ class DatabaseScheduler(Scheduler):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize the database scheduler."""
         self.app = kwargs["app"]
-        self.session_scope: sqlalchemy.Session = kwargs.get("session_scope") or self.app.conf.get(
+        self.session_scope: Callable = kwargs.get("session_scope") or self.app.conf.get(
             "session_scope"
         )
         self._dirty: Set[Any] = set()

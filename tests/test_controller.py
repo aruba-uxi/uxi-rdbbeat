@@ -20,7 +20,7 @@ from rdbbeat.exceptions import PeriodicTaskNotFound
 
 def test_get_new_crontab_schedule(scheduled_task):
     with patch("sqlalchemy.orm.Session") as mock_session:
-        mock_session.query(CrontabSchedule).filter().one_or_none.return_value = None
+        mock_session.query(CrontabSchedule).where().one_or_none.return_value = None
         crontab = get_crontab_schedule(mock_session, Schedule(**scheduled_task.get("schedule")))
         assert crontab.minute == scheduled_task.get("schedule")["minute"]
         assert crontab.hour == scheduled_task.get("schedule")["hour"]
@@ -33,7 +33,7 @@ def test_get_new_crontab_schedule(scheduled_task):
 def test_get_existing_crontab_schedule(scheduled_task, scheduled_task_db_object):
     existing_crontab = scheduled_task_db_object.crontab
     with patch("sqlalchemy.orm.Session") as mock_session:
-        mock_session.query(CrontabSchedule).filter().one_or_none.return_value = existing_crontab
+        mock_session.query(CrontabSchedule).where().one_or_none.return_value = existing_crontab
         crontab = get_crontab_schedule(mock_session, Schedule(**scheduled_task.get("schedule")))
         assert existing_crontab == crontab
 
@@ -41,7 +41,7 @@ def test_get_existing_crontab_schedule(scheduled_task, scheduled_task_db_object)
 def test_schedule_task(scheduled_task_db_object, scheduled_task):
     with patch("sqlalchemy.orm.Session") as mock_session:
         mock_session.add.return_value = None
-        mock_session.query(CrontabSchedule).filter().one_or_none.return_value = None
+        mock_session.query(CrontabSchedule).where().one_or_none.return_value = None
 
         actual_scheduled_task = schedule_task(mock_session, ScheduledTask.parse_obj(scheduled_task))
 
@@ -55,7 +55,7 @@ def test_schedule_task(scheduled_task_db_object, scheduled_task):
 def test_schedule_task_kwargs(scheduled_task_db_object, scheduled_task):
     with patch("sqlalchemy.orm.Session") as mock_session:
         mock_session.add.return_value = None
-        mock_session.query(CrontabSchedule).filter().one_or_none.return_value = None
+        mock_session.query(CrontabSchedule).where().one_or_none.return_value = None
 
         actual_scheduled_task = schedule_task(
             mock_session, ScheduledTask.parse_obj(scheduled_task), report_metadata_uid="some_uid"
@@ -82,7 +82,7 @@ def test_update_task_enabled_status(scheduled_task_db_object):
 def test_update_task_enabled_status_fail():
     with patch("sqlalchemy.orm.Session") as mock_session:
         with pytest.raises(PeriodicTaskNotFound):
-            mock_session.query(PeriodicTask).get.side_effect = NoResultFound()
+            mock_session.query(PeriodicTask).filter().one.side_effect = NoResultFound()
 
             periodic_task_id = -1
             update_task_enabled_status(mock_session, False, periodic_task_id)
@@ -90,8 +90,8 @@ def test_update_task_enabled_status_fail():
 
 def test_update_task(scheduled_task_db_object):
     with patch("sqlalchemy.orm.Session") as mock_session:
-        mock_session.query(PeriodicTask).get.return_value = scheduled_task_db_object
-        mock_session.query(CrontabSchedule).filter().one_or_none.return_value = None
+        mock_session.query(PeriodicTask).filter().one.return_value = scheduled_task_db_object
+        mock_session.query(CrontabSchedule).where().one_or_none.return_value = None
 
         new_schedule: Dict = {
             "minute": "24",
@@ -119,7 +119,7 @@ def test_update_task(scheduled_task_db_object):
             mock_session, ScheduledTask.parse_obj(new_scheduled_task), periodic_task_id
         )
 
-        assert mock_session.query(PeriodicTask).get.call_count == 1
+        assert mock_session.query(PeriodicTask).filter().one.call_count == 1
         assert actual_updated_db_task.name == expected_updated_task.name
         assert actual_updated_db_task.task == expected_updated_task.task
         assert actual_updated_db_task.schedule == expected_updated_task.schedule
@@ -129,7 +129,7 @@ def test_delete_task(scheduled_task_db_object):
     with patch("sqlalchemy.orm.Session") as mock_session:
         # Set up the mock_session
         periodic_task_id = 1
-        mock_session.query(PeriodicTask).get.return_value = scheduled_task_db_object
+        mock_session.query(PeriodicTask).where().one.return_value = scheduled_task_db_object
         mock_session.delete.return_value = None
         # Delete task
         with patch("rdbbeat.controller.is_crontab_used") as is_crontab_used:

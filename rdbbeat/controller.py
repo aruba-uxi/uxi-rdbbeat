@@ -16,7 +16,7 @@ from rdbbeat.exceptions import PeriodicTaskNotFound
 def get_crontab_schedule(session: Session, schedule: Schedule) -> CrontabSchedule:
     crontab = (
         session.query(CrontabSchedule)
-        .filter(
+        .where(
             and_(
                 CrontabSchedule.minute == schedule.minute,
                 CrontabSchedule.hour == schedule.hour,
@@ -66,8 +66,8 @@ def update_task_enabled_status(
     Update task enabled status (if task is enabled or disabled).
     """
     try:
-        task = session.query(PeriodicTask).get(periodic_task_id)
-        task.enabled = enabled_status
+        task = session.query(PeriodicTask).filter(PeriodicTask.id == periodic_task_id).one()
+        task.enabled = enabled_status  # type: ignore [assignment]
         session.add(task)
 
     except NoResultFound as e:
@@ -85,11 +85,11 @@ def update_task(
     Update the details of a task including the crontab schedule
     """
     try:
-        task = session.query(PeriodicTask).get(periodic_task_id)
+        task = session.query(PeriodicTask).filter(PeriodicTask.id == periodic_task_id).one()
 
         task.crontab = get_crontab_schedule(session, scheduled_task.schedule)
-        task.name = scheduled_task.name
-        task.task = scheduled_task.task
+        task.name = scheduled_task.name  # type: ignore [assignment]
+        task.task = scheduled_task.task  # type: ignore [assignment]
         session.add(task)
 
     except NoResultFound as e:
@@ -105,7 +105,7 @@ def is_crontab_used(session: Session, crontab_schedule: CrontabSchedule) -> bool
 
 def delete_task(session: Session, periodic_task_id: int) -> PeriodicTask:
     try:
-        task = session.query(PeriodicTask).get(periodic_task_id)
+        task = session.query(PeriodicTask).where(PeriodicTask.id == periodic_task_id).one()
         session.delete(task)
         session.flush()
         if not is_crontab_used(session, task.crontab):
