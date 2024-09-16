@@ -51,28 +51,11 @@ class ModelEntry(ScheduleEntry):
         self.model = model
         self.name = model.name
         self.task = model.task
+        self.schedule = model.schedule
+        self.args = loads(model.args or "[]")
+        self.kwargs = loads(model.kwargs or "{}")
 
-        try:
-            self.schedule = model.schedule
-            logger.debug(f"schedule: {self.schedule}")
-        except Exception as e:
-            logger.error(e)
-            logger.error(
-                "Disabling schedule %s that was removed from database",
-                self.name,
-            )
-            self._disable(model)
-
-        try:
-            self.args = loads(model.args or "[]")
-            self.kwargs = loads(model.kwargs or "{}")
-        except ValueError as exc:
-            logger.exception(
-                "Removing schedule %s for argument deseralization error: %r",
-                self.name,
-                exc,
-            )
-            self._disable(model)
+        logger.debug(f"schedule: {self.schedule}")
 
         self.options = {}
         for option in ["queue", "exchange", "routing_key", "expires", "priority"]:
