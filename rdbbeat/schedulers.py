@@ -61,7 +61,6 @@ class ModelEntry(ScheduleEntry):
                 "Disabling schedule %s that was removed from database",
                 self.name,
             )
-            self._disable(model)
 
         try:
             self.args = loads(model.args or "[]")
@@ -72,7 +71,6 @@ class ModelEntry(ScheduleEntry):
                 self.name,
                 exc,
             )
-            self._disable(model)
 
         self.options = {}
         for option in ["queue", "exchange", "routing_key", "expires", "priority"]:
