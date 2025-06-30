@@ -1,0 +1,73 @@
+name: Upgrade dependencies
+
+on:
+  workflow_dispatch:
+  # Every week at 8:00am SAST on Friday
+  schedule:
+    - cron: 0 6 * * 5
+
+env:
+  python_version: 3.11
+
+jobs:
+  update-packages:
+    name: Update packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.PR_BOT }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.python_version }}
+
+      - name: Use Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: ${{ runner.os }}-uv-${{ hashFiles('requirements.txt', 'dev-requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+
+      - name: Setup Just
+        uses: extractions/setup-just@v2
+
+      - name: Setup Fury Repository
+        uses: extractions/netrc@v2
+        with:
+          machine: pypi.fury.io
+          username: ${{ secrets.FURY_AUTH_PULL }}
+
+      - name: Install Dependencies
+        run: just setup-dev
+        env:
+          UV_SYSTEM_PYTHON: 1
+
+      - name: Upgrade packages
+        run: |
+          echo "\`\`\`" > /tmp/outdated_packages.md
+          uv pip list --outdated >> /tmp/outdated_packages.md
+          echo "\`\`\`" >> /tmp/outdated_packages.md
+          just requirements-upgrade
+
+      - name: Create Pull Request
+        id: create-pull-request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "fix: update requirements"
+          branch: update-requirements
+          title: "fix: update requirements"
+          body-path: /tmp/outdated_packages.md
+
+      - name: Notify Slack Channel
+        id: slack
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.BACKEND_BOT_SLACK_TOKEN }}
+          payload: |
+            channel: ${{ vars.BACKEND_BOT_DEPENDABOT_NOTIFICATIONS_SLACK_CHANNEL }}
+            text: "Package upgrade PR created: ${{ steps.create-pull-request.outputs.pull-request-url }}"

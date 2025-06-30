@@ -1,0 +1,87 @@
+name: versioning
+run-name: Artifact versioning
+
+on:
+  ###########
+  # v1.0.0
+  # HOW TO ENABLE THIS WORKFLOW
+  #---------------------------------
+  # Pre Update Note:
+  #----------------
+  # We need to update to Chart version 13 and this requires us to stop using the imageTag in the global section of values.yaml
+  # See the change here:
+  # https://github.com/aruba-uxi/uxi-android-version-service/commit/e186bb1433e67198eca803112911c073ea1d5e84#diff-5c724de6bb1401299b6aa5e1fa1723ba9ae8c0e8eca9a0111132af22f7436396
+  # You ONLY need to update
+  # * Chart.yaml
+  # * values.yaml
+  # * values-production.yaml
+  # * values-staging.yaml
+  #---------------------------------
+  # 1. Add your repositories config to pyproject.toml using this example:
+  #    https://github.com/aruba-uxi/uxi-django-backend/blob/main/pyproject.toml#L64-L92
+  # 2. Test the workflow by running it manually from the Actions tab
+  # 3. Delete the old auto-version.yaml workflow file and rename this file to `auto-version.yaml`
+  # 4. Uncomment the `push` section below to enable automatic versioning on pushes
+  ###########
+  # push:
+  #   branches:
+  #     - main
+  #     - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: versioning-artifacts
+  cancel-in-progress: true
+
+jobs:
+  version-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          token: ${{secrets.BUMPVERSION_GITHUB_TOKEN}}
+
+      - name: install convco
+        working-directory: /tmp
+        run: |
+          curl -OL https://github.com/convco/convco/releases/latest/download/convco-deb.zip
+          unzip convco-deb.zip
+          sudo dpkg -i convco*.deb
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: setup git
+        run: |
+          git config --global user.name 'UXI Bot'
+          git config --global user.email 'aruba-uxi@users.noreply.github.com'
+
+      - name: setup
+        id: setup
+        run: |
+          echo "repo=$GITHUB_REPOSITORY" >> "$GITHUB_OUTPUT"
+          PR_NO=$(git show -s --oneline "${{ github.event.push.after }}" | sed -E 's/^.*\(#([0-9]+)\)$/\1/')
+          if echo "$PR_NO" | grep -qE '^[0-9]+$'; then
+            PR="https://github.com/${GITHUB_REPOSITORY}/pull/${PR_NO}"
+          else
+            PR="https://github.com/${GITHUB_REPOSITORY}/commit/$(git show -s --oneline)"
+          fi
+          echo "pr=$PR" >> "$GITHUB_OUTPUT"
+
+      - name: autoversioner
+        id: autoversioner
+        run: python -m tools.autoversion
+        env:
+          AUTOVERSION_PR: ${{ steps.setup.outputs.pr }}
+          AUTOVERSION_REPO: ${{ steps.setup.outputs.repo }}
+          AUTOVERSION_SLACK_URL: ${{ secrets.SLACK_PACKAGE_WEBHOOK }}
+
+      - name: push new commits
+        run: git push --follow-tags
