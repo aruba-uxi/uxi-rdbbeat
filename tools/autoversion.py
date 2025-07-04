@@ -89,22 +89,24 @@ def autoversion(  # noqa: PLR0913
     log.info(commit_msg)
     tag = f"{version_prefix}{version_value}"
     _ = subprocess.run(["git", "commit", "-am", commit_msg], check=True)  # noqa: S603, S607
-    _ = subprocess.run(["git", "tag", "-f", "-a", tag, "-m", f"release version: {tag}"], check=True)  # noqa: S603, S607
 
     if not yaml_path or not yaml_key:
         log.info("No YAML path or key provided, skipping YAML update.")
+        _ = subprocess.run(["git", "tag", "-f", "-a", tag, "-m", f"release version: {tag}"], check=True)  # noqa: S603, S607
         return VersionedAsset(name=name, old_version=current_version, new_version=version_value)
 
     _update_yaml_key(yaml_path, yaml_key, version_value)
     result = subprocess.run(["git", "diff", "--quiet", "HEAD"], check=False)  # noqa: S603, S607
     if result.returncode == 0:
         log.info("No changes detected.")
+        _ = subprocess.run(["git", "tag", "-f", "-a", tag, "-m", f"release version: {tag}"], check=True)  # noqa: S603, S607
         # No changes
         return None
     log.info("Changes detected. Committing.")
     commit_msg = f"fix: update {name} to {version_value} [skip ci]"
     log.info(commit_msg)
     _ = subprocess.run(["git", "commit", "-am", commit_msg], check=True)  # noqa: S603, S607
+    _ = subprocess.run(["git", "tag", "-f", "-a", tag, "-m", f"release version: {tag}"], check=True)  # noqa: S603, S607
     return VersionedAsset(name=name, old_version=current_version, new_version=version_value)
 
 
